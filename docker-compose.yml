@@ -1,0 +1,44 @@
+version: "3.8"
+services:
+  spring-boot:
+    build: 
+      context: ./
+      dockerfile: ./employee-system-backend/Dockerfile
+    ports:
+      - 8087:8080
+    depends_on:
+      - postgres
+    links:
+      - postgres
+    networks:
+      - spring-cloud-network
+    restart: always
+
+  react-app:
+    build: 
+      context: ./
+      dockerfile: ./employee-system-frontend/Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - spring-boot  
+    networks:
+      - spring-cloud-network
+    restart: always
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: employee_system
+      PGDATA: /data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - spring-cloud-network
+    restart: unless-stopped
+
+networks:
+    spring-cloud-network:
+        driver: bridge
